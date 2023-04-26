@@ -26,10 +26,11 @@
     "php": "^8.1",
     "ext-pdo": "^8.1",
     "phpmailer/phpmailer": "^6.8.0",
-	  "league/plates": "v3.x-dev",
+	  "league/plates": "v4.0.0-alpha",
     "coffeecode/uploader": "2.0.*",
     "coffeecode/cropper": "2.0.*",
     "coffeecode/optimizer": "2.1.*",
-    "coffeecode/paginator": "2.0.*"
+    "coffeecode/paginator": "2.0.*",
+    "coffeecode/router": "2.0.*"
   }
 }
