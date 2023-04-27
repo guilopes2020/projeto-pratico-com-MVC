@@ -3,6 +3,7 @@
  * DATABASE
  */
 define("CONF_DB_HOST", "localhost");
+define("CONF_DB_PORT", "3306");
 define("CONF_DB_USER", "guilopes");
 define("CONF_DB_PASS", "password");
 define("CONF_DB_NAME", "fullstackphp");
