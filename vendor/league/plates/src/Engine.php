@@ -48,6 +48,7 @@ final class Engine
 
     /** @return string */
     public function render(string $template_name, array $data = [], array $attributes = []): string {
+
         return $this->container->get('renderTemplate')->renderTemplate(new Template(
             $template_name,
             $data,
