@@ -69,7 +69,13 @@ class Web extends Controller
         ]);
     }
 
-    public function blogPost(array $data)
+    /**
+     * BlogPost method
+     *
+     * @param array $data
+     * @return void
+     */
+    public function blogPost(array $data): void
     {
         $postName = $data['post_name'];
 
@@ -92,6 +98,48 @@ class Web extends Controller
         $head = $this->seo->render(CONF_SITE_NAME . " - Termos de uso", CONF_SITE_DESC, url("/termos"), theme("/assets/images/share.jpg"));
 
         echo $this->view->render("terms", [
+            'head'  => $head,
+        ]);
+    }
+
+    /**
+     * Login Method
+     *
+     * @return void
+     */
+    public function login(): void
+    {
+        $head = $this->seo->render("Entrar - " . CONF_SITE_NAME, CONF_SITE_DESC, url("/entrar"), theme("/assets/images/share.jpg"));
+
+        echo $this->view->render("auth-login", [
+            'head'  => $head,
+        ]);
+    }
+
+    /**
+     * Forget Method
+     *
+     * @return void
+     */
+    public function forget(): void
+    {
+        $head = $this->seo->render("Recuperar Senha - " . CONF_SITE_NAME, CONF_SITE_DESC, url("/recuperar"), theme("/assets/images/share.jpg"));
+
+        echo $this->view->render("auth-forget", [
+            'head'  => $head,
+        ]);
+    }
+
+    /**
+     * Register Method
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $head = $this->seo->render("Criar Conta - " . CONF_SITE_NAME, CONF_SITE_DESC, url("/cadastrar"), theme("/assets/images/share.jpg"));
+
+        echo $this->view->render("auth-register", [
             'head'  => $head,
         ]);
     }
