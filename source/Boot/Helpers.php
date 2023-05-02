@@ -152,6 +152,16 @@ function url(string $path = null): ?string
 }
 
 /**
+ * Url Back
+ *
+ * @return string
+ */
+function url_back(): string
+{
+    return ($_SERVER['HTTP_REFERER'] ?? url());
+}
+
+/**
  * Undocumented function
  *
  * @param string|null $path
