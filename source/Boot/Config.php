@@ -91,6 +91,7 @@ define("CONF_MAIL_SENDER", [
     'name'    => 'Guilherme Lopes',
     'address' => 'rapozao2007@gmail.com',
 ]);
+define("CONF_MAIL_SUPPORT", "support@upinside.com");
 define("CONF_MAIL_OPTION_LANG", "br");
 define("CONF_MAIL_OPTION_HTML", true);
 define("CONF_MAIL_OPTION_AUTH", true);

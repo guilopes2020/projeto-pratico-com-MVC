@@ -2,6 +2,7 @@
 
 namespace Source\App;
 
+use Source\Core\Connect;
 use stdClass;
 use Source\Support\Pager;
 use Source\Core\Controller;
@@ -181,13 +182,36 @@ class Web extends Controller
     public function error(array $data): void
     {
         $error = new stdClass();
-        $error->code = $data['errcode'];
-        $error->title = "Ooops. conteúdo indisponivel.";
-        $error->message = "Sentimos muito, mas o conteúdo que vc esta tentando acessar nao existe, esta indisponivel no momento ou foi removido.";
-        $error->linkTitle = "continue navegando";
-        $error->link = url_back();
 
-        $head = $this->seo->render("{$error->code} | {$error->title}", $error->message, url_back("/ops/{$error->code}"), theme("/assets/images/share.jpg"), false);
+        switch ($data['errcode']) {
+            case 'problemas':
+                $error->code = 'OPS';
+                $error->title = "Estamos enfrentando problemas.";
+                $error->message = "Parece que nosso serviço nao esta disponivel no momento. Ja estamos vendo isso mas caso precise entre em contato conosco.";
+                $error->linkTitle = "Enviar E-mail";
+                $error->link = "mailto:" . CONF_MAIL_SUPPORT;    
+            break;
+
+            case 'manutencao':
+                $error->code = 'OPS';
+                $error->title = "Desculpe. Estamos em manutenção.";
+                $error->message = "Voltamos logo. Por hora estamos trabalhando para melhorar nosso conteúdo para você controlar melhor suas constas :P";
+                $error->linkTitle = null;
+                $error->link = null;
+            break;    
+            
+            default:
+                $error->code = $data['errcode'];
+                $error->title = "Ooops. conteúdo indisponivel.";
+                $error->message = "Sentimos muito, mas o conteúdo que vc esta tentando acessar nao existe, esta indisponivel no momento ou foi removido.";
+                $error->linkTitle = "continue navegando";
+                $error->link = url_back();    
+            break;
+        }
+
+        
+
+        $head = $this->seo->render("{$error->code} | {$error->title}", $error->message, url("/ops/{$error->code}"), theme("/assets/images/share.jpg"), false);
 
         echo $this->view->render("error", [
             'head'  => $head,
