@@ -89,20 +89,6 @@ class Web extends Controller
     }
 
     /**
-     * Terms Method
-     *
-     * @return void
-     */
-    public function terms(): void
-    {
-        $head = $this->seo->render(CONF_SITE_NAME . " - Termos de uso", CONF_SITE_DESC, url("/termos"), theme("/assets/images/share.jpg"));
-
-        echo $this->view->render("terms", [
-            'head'  => $head,
-        ]);
-    }
-
-    /**
      * Login Method
      *
      * @return void
@@ -143,7 +129,48 @@ class Web extends Controller
             'head'  => $head,
         ]);
     }
+
+    /**
+     * Confirm Method
+     *
+     * @return void
+     */
+    public function confirm(): void
+    {
+        $head = $this->seo->render("Confirme seu Cadastro - " . CONF_SITE_NAME, CONF_SITE_DESC, url("/confirma"), theme("/assets/images/share.jpg"));
+
+        echo $this->view->render("optin-confirm", [
+            'head'  => $head,
+        ]);
+    }
+
+    /**
+     * Success Method
+     *
+     * @return void
+     */
+    public function success(): void
+    {
+        $head = $this->seo->render("Bem Vindo ao " . CONF_SITE_NAME, CONF_SITE_DESC, url("/obrigado"), theme("/assets/images/share.jpg"));
+
+        echo $this->view->render("optin-success", [
+            'head'  => $head,
+        ]);
+    }
     
+    /**
+     * Terms Method
+     *
+     * @return void
+     */
+    public function terms(): void
+    {
+        $head = $this->seo->render(CONF_SITE_NAME . " - Termos de uso", CONF_SITE_DESC, url("/termos"), theme("/assets/images/share.jpg"));
+
+        echo $this->view->render("terms", [
+            'head'  => $head,
+        ]);
+    }
 
     /**
      * Error Method
