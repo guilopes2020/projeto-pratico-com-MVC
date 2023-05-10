@@ -23,6 +23,12 @@ define("CONF_SITE_TITLE", "Gerencie suas contas com o melhor café");
 define("CONF_SITE_DESC", "O CafeControl é um gerenciador de contas simples, poderoso e gratuito. O prazer de tomar um café e ter o controle total de suas contas.");
 define("CONF_SITE_LANG", "pt_BR");
 define("CONF_SITE_DOMAIN", "upinside.com.br");
+define("CONF_SITE_ADDR_STREET", "SC 406 - Rod. Dr Antonio Luiz Moura Gonzaga");
+define("CONF_SITE_ADDR_NUMBER", "3339");
+define("CONF_SITE_ADDR_COMPLEMENT", "Bloco A, sala 208");
+define("CONF_SITE_ADDR_CITY", "Florianópolis");
+define("CONF_SITE_ADDR_STATE", "SC");
+define("CONF_SITE_ADDR_ZIPCODE", "88048-301");
 
 /**
  * SOCIAL
@@ -52,23 +58,24 @@ define("CONF_PASSWD_OPTION", ["cost" => 10]);
 /**
  * MESSAGE
  */
-define("CONF_MESSAGE_CLASS", "trigger");
-define("CONF_MESSAGE_INFO", "info");
-define("CONF_MESSAGE_SUCCESS", "success");
-define("CONF_MESSAGE_WARNING", "warning");
-define("CONF_MESSAGE_ERROR", "error");
+define("CONF_MESSAGE_CLASS", "message");
+define("CONF_MESSAGE_INFO", "info icon-info");
+define("CONF_MESSAGE_SUCCESS", "success icon-check-square-o");
+define("CONF_MESSAGE_WARNING", "warning icon-warning");
+define("CONF_MESSAGE_ERROR", "error icon-warning");
 
 /**
  * VIEW
  */
 define("CONF_VIEW_PATH", __DIR__ . "/../../shared/views");
 define("CONF_VIEW_EXT", "php");
-define("CONF_VIEW_THEME", "cafecontrol");
+define("CONF_VIEW_THEME", "cafeweb");
+define("CONF_VIEW_APP", "cafeapp");
 
 /**
  * UPLOAD
  */
-define("CONF_UPLOAD_DIR", "../storage");
+define("CONF_UPLOAD_DIR", "storage");
 define("CONF_UPLOAD_IMAGE_DIR", "images");
 define("CONF_UPLOAD_FILE_DIR", "files");
 define("CONF_UPLOAD_MEDIA_DIR", "medias");

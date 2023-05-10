@@ -30,6 +30,7 @@ if (strpos(url(), "localhost")) {
      */
     $minJs = new JS();
     $minJs->add(__DIR__ . "/../../shared/scripts/jquery.min.js");
+    $minJs->add(__DIR__ . "/../../shared/scripts/jquery.form.js");
     $minJs->add(__DIR__ . "/../../shared/scripts/jquery-ui.js");
 
     //theme JS
