@@ -21,18 +21,35 @@ $route->get("/", "Web:home");
 $route->get("/sobre", "Web:about");
 
 //blog
-$route->get("/blog", "Web:blog");
-$route->get("/blog/page/{page}", "Web:blog");
-$route->get("/blog/{postName}", "Web:blogPost");
+$route->group("/blog");
+$route->get("/", "Web:blog");
+$route->get("/p/{page}", "Web:blog");
+$route->get("/{uri}", "Web:blogPost");
+$route->post("/buscar", "Web:blogSearch");
+$route->get("/buscar/{terms}/{page}", "Web:blogSearch");
 
 //auth
+$route->group(null);
 $route->get("/entrar", "Web:login");
-$route->get("/recuperar", "Web:forget");
+$route->post("/entrar", "Web:login");
 $route->get("/cadastrar", "Web:register");
+$route->post("/cadastrar", "Web:register");
+$route->get("/recuperar", "Web:forget");
+$route->post("/recuperar", "Web:forget");
+$route->get("/recuperar/{code}", "Web:reset");
+$route->post("/recuperar/resetar", "Web:reset");
+// $route->get("/recuperar/confirma", "Web:forgetConfirm");
 
 //optin
 $route->get('/confirma', 'Web:confirm');
-$route->get('/obrigado', 'Web:success');
+$route->get('/obrigado/{email}', 'Web:success');
+
+/* 
+* APP
+*/
+$route->group('/app');
+$route->get('/', 'App:home');
+$route->get('/sair', 'App:logout');
 
 //Services
 $route->get("/termos", "Web:terms");
