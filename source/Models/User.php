@@ -36,13 +36,12 @@ class User extends Model
         string $document = null
     ): User {
         $this->first_name = $firstName;
-        $this->last_name  = $lastName;
-        $this->email      = $email;
-        $this->password   = $password;
-        $this->document   = $document;
+        $this->last_name = $lastName;
+        $this->email = $email;
+        $this->password = $password;
+        $this->document = $document;
         return $this;
     }
-    
 
     /**
      * @param string $email
@@ -54,7 +53,6 @@ class User extends Model
         $find = $this->find("email = :email", "email={$email}", $columns);
         return $find->fetch();
     }
-
 
     /**
      * @return bool
@@ -84,7 +82,7 @@ class User extends Model
         if (!empty($this->id)) {
             $userId = $this->id;
 
-            if ($this->find("email = :e AND id != :i", "e={$this->email}&i={$userId}", 'id')->fetch()) {
+            if ($this->find("email = :e AND id != :i", "e={$this->email}&i={$userId}", "id")->fetch()) {
                 $this->message->warning("O e-mail informado já está cadastrado");
                 return false;
             }
@@ -98,7 +96,7 @@ class User extends Model
 
         /** User Create */
         if (empty($this->id)) {
-            if ($this->findByEmail($this->email, 'id')) {
+            if ($this->findByEmail($this->email, "id")) {
                 $this->message->warning("O e-mail informado já está cadastrado");
                 return false;
             }
@@ -113,5 +111,4 @@ class User extends Model
         $this->data = ($this->findById($userId))->data();
         return true;
     }
-
 }

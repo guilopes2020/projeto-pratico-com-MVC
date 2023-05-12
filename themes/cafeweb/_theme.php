@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+        <meta name="mit" content="2023-05-11T09:28:07-03:00+199131">
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
     <?= $head; ?>
@@ -90,14 +91,15 @@
                 <a target="_blank" class="icon-facebook"
                    href="https://www.facebook.com/<?= CONF_SOCIAL_FACEBOOK_PAGE; ?>" title="CafeControl no Facebook">/CafeControl</a>
                 <a target="_blank" class="icon-instagram"
-                   href="https://www.instagram.com/<?= CONF_SOCIAL_FACEBOOK_PAGE; ?>" title="CafeControl no Instagram">@CafeControl</a>
-                <a target="_blank" class="icon-youtube" href="https://www.youtube.com/<?= CONF_SOCIAL_FACEBOOK_PAGE; ?>"
+                   href="https://www.instagram.com/<?= CONF_SOCIAL_INSTAGRAM_PAGE; ?>" title="CafeControl no Instagram">@CafeControl</a>
+                <a target="_blank" class="icon-youtube" href="https://www.youtube.com/<?= CONF_SOCIAL_YOUTUBE_PAGE; ?>"
                    title="CafeControl no YouTube">/CafeControl</a>
             </article>
         </section>
     </div>
 </footer>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-53658515-18"></script>
 <script src="<?= theme("/assets/scripts.js"); ?>"></script>
 <?= $v->section("scripts"); ?>
 

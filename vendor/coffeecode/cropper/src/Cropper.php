@@ -41,9 +41,6 @@ class Cropper
      */
     private static array $allowedExt = ['image/jpeg', "image/png"];
 
-    /** @var ConversionFailedException */
-    public ConversionFailedException $exception;
-
     /**
      * Cropper constructor.
      * compressor must be 1-9
@@ -123,12 +120,10 @@ class Cropper
      */
     protected function name(string $name, int $width = null, int $height = null): string
     {
-        $filterName = mb_convert_encoding(htmlspecialchars(mb_strtolower(pathinfo($name)["filename"])), 'ISO-8859-1',
-            'UTF-8');
-        $formats = mb_convert_encoding('ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜüÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿRr"!@#$%&*()_-+={[}]/?;:.,\\\'<>°ºª',
-            'ISO-8859-1', 'UTF-8');
-        $replace = 'aaaaaaaceeeeiiiidnoooooouuuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr                                 ';
-        $trimName = trim(strtr($filterName, $formats, $replace));
+        $filterName = filter_var(mb_strtolower(pathinfo($name)["filename"]), FILTER_UNSAFE_RAW);
+        $formats = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜüÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿRr"!@#$%&*()_-+={[}]/?;:.,\\\'<>°ºª';
+        $replace = 'aaaaaaaceeeeiiiidnoooooouuuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr                                 ';
+        $trimName = trim(strtr(utf8_decode($filterName), utf8_decode($formats), $replace));
         $name = str_replace(["-----", "----", "---", "--"], "-", str_replace(" ", "-", $trimName));
 
         $hash = $this->hash($this->imagePath);
@@ -183,11 +178,11 @@ class Cropper
         $cmp_y = $src_h / $height;
 
         if ($cmp_x > $cmp_y) {
-            $src_x = round(($src_w - ($src_w / $cmp_x * $cmp_y)) / 2);
             $src_w = round($src_w / $cmp_x * $cmp_y);
+            $src_x = round(($src_w - ($src_w / $cmp_x * $cmp_y))); //2
         } elseif ($cmp_y > $cmp_x) {
-            $src_y = round(($src_h - ($src_h / $cmp_y * $cmp_x)) / 2);
             $src_h = round($src_h / $cmp_y * $cmp_x);
+            $src_y = round(($src_h - ($src_h / $cmp_y * $cmp_x))); //2
         }
 
         $height = (int)$height;
@@ -289,8 +284,7 @@ class Cropper
             }
 
             return $webPConverted;
-        } catch (ConversionFailedException $exception) {
-            $this->exception = $exception;
+        } catch (ConversionFailedException) {
             return $image;
         }
     }

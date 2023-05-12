@@ -10,32 +10,35 @@ use Source\Core\Model;
  */
 class Post extends Model
 {
+    /** @var bool */
+    private $all;
+
     /**
-     * Post Constructor
+     * Post constructor.
+     * @param bool $all = ignore status and post_at
      */
-    public function __construct()
+    public function __construct(bool $all = false)
     {
-        parent::__construct('posts', ['id'], ['title', 'id', 'subtitle', 'content']);    
+        $this->all = $all;
+        parent::__construct("posts", ["id"], ["title", "uri", "subtitle", "content"]);
     }
 
     /**
-     * Find Post Method
-     *
-     * @param string|null $terms
-     * @param string|null $params
+     * @param null|string $terms
+     * @param null|string $params
      * @param string $columns
-     * @return Model
+     * @return mixed|Model
      */
-    public function find(?string $terms = null, ?string $params = null, string $columns = "*"): Model
+    public function find(?string $terms = null, ?string $params = null, string $columns = "*")
     {
-        $terms = "status = :status AND post_at <= NOW()" . ($terms ? " AND {$terms}" : "");
-        $params = "status=post" . ($params ? "&{$params}" : "");
+        if (!$this->all) {
+            $terms = "status = :status AND post_at <= NOW()" . ($terms ? " AND {$terms}" : "");
+            $params = "status=post" . ($params ? "&{$params}" : "");
+        }
         return parent::find($terms, $params, $columns);
     }
 
     /**
-     * Find Post by Uri Method
-     *
      * @param string $uri
      * @param string $columns
      * @return null|Post
@@ -47,8 +50,6 @@ class Post extends Model
     }
 
     /**
-     * Find Author Method
-     *
      * @return null|User
      */
     public function author(): ?User
@@ -60,21 +61,17 @@ class Post extends Model
     }
 
     /**
-     * Find Category Method
-     *
      * @return null|Category
      */
     public function category(): ?Category
     {
-        if ($this->category_id) {
-            return (new Category())->findById($this->category_id);
+        if ($this->category) {
+            return (new Category())->findById($this->category);
         }
         return null;
     }
 
     /**
-     * Save Post Method
-     *
      * @return bool
      */
     public function save(): bool
@@ -83,19 +80,16 @@ class Post extends Model
         if (!empty($this->id)) {
             $postId = $this->id;
 
-            $this->update($this->safe(), 'id = :id', "id={$postId}");
+            $this->update($this->safe(), "id = :id", "id={$postId}");
             if ($this->fail()) {
-                $this->message->error('erro ao atualizar, verifique os dados');
+                $this->message->error("Erro ao atualizar, verifique os dados");
                 return false;
             }
         }
 
-        /** Post Create */
-
-        
+        /** Post Creste */
 
         $this->data = $this->findById($postId)->data();
         return true;
     }
-
 }

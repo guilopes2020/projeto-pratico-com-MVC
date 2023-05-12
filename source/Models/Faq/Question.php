@@ -11,20 +11,18 @@ use Source\Core\Model;
 class Question extends Model
 {
     /**
-     * Contructor method
+     * Question constructor.
      */
     public function __construct()
     {
-        parent::__construct('faq_questions', ['id'], ['channel_id', 'question', 'response']);    
+        parent::__construct("faq_questions", ["id"], ["channel_id", "question", "response"]);
     }
 
     /**
-     * Save Method
-     *
      * @return bool
      */
     public function save(): bool
     {
-        
+
     }
 }

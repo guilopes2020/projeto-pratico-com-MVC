@@ -1,9 +1,5 @@
 <?php
 
-use DateTime;
-use Source\Core\Session;
-use Source\Support\Thumb;
-
 /**
  * ####################
  * ###   VALIDATE   ###
@@ -11,8 +7,10 @@ use Source\Support\Thumb;
  */
 
 /**
+ * Is Email Mehod Helper
+ *
  * @param string $email
- * @return bool
+ * @return boolean
  */
 function is_email(string $email): bool
 {
@@ -20,8 +18,10 @@ function is_email(string $email): bool
 }
 
 /**
+ * Is Password Helper
+ *
  * @param string $password
- * @return bool
+ * @return boolean
  */
 function is_passwd(string $password): bool
 {
@@ -39,12 +39,14 @@ function is_passwd(string $password): bool
  */
 
 /**
+ * Str Slug Helper
+ *
  * @param string $string
  * @return string
  */
 function str_slug(string $string): string
 {
-    $string = filter_var(mb_strtolower($string), FILTER_SANITIZE_SPECIAL_CHARS);
+    $string = filter_var(mb_strtolower($string), FILTER_SANITIZE_STRIPPED);
     $formats = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜüÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿRr"!@#$%&*()_-+={[}]/?;:.,\\\'<>°ºª';
     $replace = 'aaaaaaaceeeeiiiidnoooooouuuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr                                 ';
 
@@ -57,6 +59,8 @@ function str_slug(string $string): string
 }
 
 /**
+ * Str Studly Case Helper
+ *
  * @param string $string
  * @return string
  */
@@ -71,6 +75,8 @@ function str_studly_case(string $string): string
 }
 
 /**
+ * Str Camel Case Helper
+ *
  * @param string $string
  * @return string
  */
@@ -80,6 +86,8 @@ function str_camel_case(string $string): string
 }
 
 /**
+ * Str Title Helper
+ *
  * @param string $string
  * @return string
  */
@@ -89,8 +97,10 @@ function str_title(string $string): string
 }
 
 /**
+ * Str Limit Words Helper
+ *
  * @param string $string
- * @param int $limit
+ * @param integer $limit
  * @param string $pointer
  * @return string
  */
@@ -109,8 +119,10 @@ function str_limit_words(string $string, int $limit, string $pointer = "..."): s
 }
 
 /**
+ * Str Limit CHars Helper
+ *
  * @param string $string
- * @param int $limit
+ * @param integer $limit
  * @param string $pointer
  * @return string
  */
@@ -132,16 +144,17 @@ function str_limit_chars(string $string, int $limit, string $pointer = "..."): s
  */
 
 /**
- * @param string $path
- * @return null|string
+ * Url Helper
+ *
+ * @param string|null $path
+ * @return string
  */
-function url(string $path = null): ?string
+function url(string $path = null): string
 {
-    if (strpos($_SERVER['HTTP_HOST'], 'localhost')) {
+    if (strpos($_SERVER['HTTP_HOST'], "localhost")) {
         if ($path) {
-            return CONF_URL_TEST . "/" . ($path[0] == "/" ? mb_substr($path, 1): $path);
+            return CONF_URL_TEST . "/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
         }
-
         return CONF_URL_TEST;
     }
 
@@ -153,7 +166,7 @@ function url(string $path = null): ?string
 }
 
 /**
- * Url Back
+ * Url Back Helper
  *
  * @return string
  */
@@ -163,7 +176,10 @@ function url_back(): string
 }
 
 /**
+ * Redirect Method Helper
+ *
  * @param string $url
+ * @return void
  */
 function redirect(string $url): void
 {
@@ -173,7 +189,7 @@ function redirect(string $url): void
         exit;
     }
 
-    if (filter_input(INPUT_GET, 'route', FILTER_DEFAULT) != $url) {
+    if (filter_input(INPUT_GET, "route", FILTER_DEFAULT) != $url) {
         $location = url($url);
         header("Location: {$location}");
         exit;
@@ -187,30 +203,30 @@ function redirect(string $url): void
  */
 
 /**
- * Theme
+ * Theme Method Helper
  *
  * @param string|null $path
  * @return string
  */
 function theme(string $path = null): string
 {
-    if (strpos($_SERVER['HTTP_HOST'], 'localhost')) {
+    if (strpos($_SERVER['HTTP_HOST'], "localhost")) {
         if ($path) {
-            return CONF_URL_TEST . "/themes/" . CONF_VIEW_THEME . "/" . ($path[0] == "/" ? mb_substr($path, 1): $path);
+            return CONF_URL_TEST . "/themes/" . CONF_VIEW_THEME . "/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
         }
 
         return CONF_URL_TEST . "/themes/" . CONF_VIEW_THEME;
     }
 
     if ($path) {
-        return CONF_URL_BASE . "/themes/" . CONF_VIEW_THEME . "/" . ($path[0] == "/" ? mb_substr($path, 1): $path);
+        return CONF_URL_BASE . "/themes/" . CONF_VIEW_THEME . "/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
     }
 
     return CONF_URL_BASE . "/themes/" . CONF_VIEW_THEME;
 }
 
 /**
- * Image
+ * Image Method Helper
  *
  * @param string $image
  * @param integer $width
@@ -219,7 +235,7 @@ function theme(string $path = null): string
  */
 function image(string $image, int $width, int $height = null): string
 {
-    return url() . "/" . (new Thumb())->make($image, $width, $height);
+    return url() . "/" . (new \Source\Support\Thumb())->make($image, $width, $height);
 }
 
 /**
@@ -229,6 +245,8 @@ function image(string $image, int $width, int $height = null): string
  */
 
 /**
+ * Date Format Method Helper
+ *
  * @param string $date
  * @param string $format
  * @return string
@@ -239,6 +257,8 @@ function date_fmt(string $date = "now", string $format = "d/m/Y H\hi"): string
 }
 
 /**
+ * Date Format_BR Method Helper
+ *
  * @param string $date
  * @return string
  */
@@ -248,6 +268,8 @@ function date_fmt_br(string $date = "now"): string
 }
 
 /**
+ * Date Format App Method Helper
+ *
  * @param string $date
  * @return string
  */
@@ -263,6 +285,8 @@ function date_fmt_app(string $date = "now"): string
  */
 
 /**
+ * Password Method Helper
+ *
  * @param string $password
  * @return string
  */
@@ -271,10 +295,13 @@ function passwd(string $password): string
     if (!empty(password_get_info($password)['algo'])) {
         return $password;
     }
+
     return password_hash($password, CONF_PASSWD_ALGO, CONF_PASSWD_OPTION);
 }
 
 /**
+ * Password Verify Method Helper
+ *
  * @param string $password
  * @param string $hash
  * @return bool
@@ -285,6 +312,8 @@ function passwd_verify(string $password, string $hash): bool
 }
 
 /**
+ * Password He-Hash Method Helper
+ *
  * @param string $hash
  * @return bool
  */
@@ -300,22 +329,26 @@ function passwd_rehash(string $hash): bool
  */
 
 /**
+ * Csrf Input Method Helper
+ *
  * @return string
  */
 function csrf_input(): string
 {
-    $session = new Session();
+    $session = new \Source\Core\Session();
     $session->csrf();
     return "<input type='hidden' name='csrf' value='" . ($session->csrf_token ?? "") . "'/>";
 }
 
 /**
+ * Csrf Verify Method Helper
+ *
  * @param $request
  * @return bool
  */
 function csrf_verify($request): bool
 {
-    $session = new Session();
+    $session = new \Source\Core\Session();
     if (empty($session->csrf_token) || empty($request['csrf']) || $request['csrf'] != $session->csrf_token) {
         return false;
     }
@@ -323,15 +356,64 @@ function csrf_verify($request): bool
 }
 
 /**
- * Flash
+ * Flash Method Helper
  *
- * @return null|string
+ * @return string|null
  */
 function flash(): ?string
 {
-    $session = new Session();
+    $session = new \Source\Core\Session();
     if ($flash = $session->flash()) {
-        echo $flash;
+        return $flash;
     }
     return null;
+}
+
+/**
+ * Request Limit Method Helper
+ *
+ * @param string $key
+ * @param integer $limit
+ * @param integer $seconds
+ * @return bool
+ */
+function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
+{
+    $session = new \Source\Core\Session();
+    if ($session->has($key) && $session->$key->time >= time() && $session->$key->requests < $limit) {
+        $session->set($key, [
+            "time"     => time() + $seconds,
+            "requests" => $session->$key->requests + 1
+        ]);
+        return false;
+    }
+
+    if ($session->has($key) && $session->$key->time >= time() && $session->$key->requests >= $limit) {
+        return true;
+    }
+
+    $session->set($key, [
+        "time"     => time() + $seconds,
+        "requests" => 1
+    ]);
+
+    return false;
+}
+
+/**
+ * Request Repeat Method Helper
+ *
+ * @param string $field
+ * @param string $value
+ * @return bool
+ */
+function request_repeat(string $field, string $value): bool
+{
+    $session = new \Source\Core\Session();
+    if ($session->has($field) && $session->$field == $value) {
+        return true;
+    }
+
+    $session->set($field, $value);
+    return false;
 }

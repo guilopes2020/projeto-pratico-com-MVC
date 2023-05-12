@@ -2,14 +2,13 @@
 
 namespace Source\Core;
 
-use Source\Core\View;
-use Source\Support\Seo;
 use Source\Support\Message;
+use Source\Support\Seo;
 
 /**
- * Class Controller
+ * FSPHP | Class Controller
  *
- * @author Guilherme L. Armindo <guilopesdev@hotmail.com>
+ * @author Robson V. Leite <cursos@upinside.com.br>
  * @package Source\Core
  */
 class Controller
@@ -24,14 +23,14 @@ class Controller
     protected $message;
 
     /**
-     * Controller constructor
+     * Controller Constructor
      *
      * @param string|null $pathToViews
      */
     public function __construct(string $pathToViews = null)
     {
         $this->view = new View($pathToViews);
-        $this->seo  = new Seo();
+        $this->seo = new Seo();
         $this->message = new Message();
     }
 }
