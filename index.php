@@ -1,22 +1,23 @@
 <?php
 ob_start();
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . "/vendor/autoload.php";
 
 /**
  * BOOTSTRAP
  */
 
-use Source\Core\Session;
 use CoffeeCode\Router\Router;
+use Source\Core\Session;
 
 $session = new Session();
 $route = new Router(url(), ":");
+$route->namespace("Source\App");
 
 /**
  * WEB ROUTES
  */
-$route->namespace("Source\App");
+$route->group(null);
 $route->get("/", "Web:home");
 $route->get("/sobre", "Web:about");
 
@@ -27,6 +28,8 @@ $route->get("/p/{page}", "Web:blog");
 $route->get("/{uri}", "Web:blogPost");
 $route->post("/buscar", "Web:blogSearch");
 $route->get("/buscar/{terms}/{page}", "Web:blogSearch");
+$route->get("/em/{category}", "Web:blogCategory");
+$route->get("/em/{category}/{page}", "Web:blogCategory");
 
 //auth
 $route->group(null);
@@ -38,26 +41,27 @@ $route->get("/recuperar", "Web:forget");
 $route->post("/recuperar", "Web:forget");
 $route->get("/recuperar/{code}", "Web:reset");
 $route->post("/recuperar/resetar", "Web:reset");
-// $route->get("/recuperar/confirma", "Web:forgetConfirm");
 
 //optin
-$route->get('/confirma', 'Web:confirm');
-$route->get('/obrigado/{email}', 'Web:success');
+$route->group(null);
+$route->get("/confirma", "Web:confirm");
+$route->get("/obrigado/{email}", "Web:success");
 
-/* 
-* APP
-*/
-$route->group('/app');
-$route->get('/', 'App:home');
-$route->get('/sair', 'App:logout');
-
-//Services
+//services
+$route->group(null);
 $route->get("/termos", "Web:terms");
+
+/**
+ * APP
+ */
+$route->group("/app");
+$route->get("/", "App:home");
+$route->get("/sair", "App:logout");
 
 /**
  * ERROR ROUTES
  */
-$route->namespace("Source\App")->group("/ops");
+$route->group("/ops");
 $route->get("/{errcode}", "Web:error");
 
 /**
@@ -69,7 +73,7 @@ $route->dispatch();
  * ERROR REDIRECT
  */
 if ($route->error()) {
-	$route->redirect("/ops/{$route->error()}");
-} 
+    $route->redirect("/ops/{$route->error()}");
+}
 
 ob_end_flush();

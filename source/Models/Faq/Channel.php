@@ -11,20 +11,18 @@ use Source\Core\Model;
 class Channel extends Model
 {
     /**
-     * Channel constructor
+     * Channel constructor.
      */
     public function __construct()
     {
-        parent::__construct('faq_channels', ['id'], ['channel', 'description']);    
+        parent::__construct("faq_channels", ["id"], ["channel", "description"]);
     }
 
     /**
-     * Save Method
-     *
      * @return bool
      */
     public function save(): bool
     {
-        
+
     }
 }

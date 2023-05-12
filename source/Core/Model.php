@@ -2,9 +2,6 @@
 
 namespace Source\Core;
 
-use PDO;
-use stdClass;
-use PDOException;
 use Source\Support\Message;
 
 /**
@@ -18,7 +15,7 @@ abstract class Model
     /** @var object|null */
     protected $data;
 
-    /** @var PDOException|null */
+    /** @var \PDOException|null */
     protected $fail;
 
     /** @var Message|null */
@@ -64,30 +61,35 @@ abstract class Model
     }
 
     /**
+     * Magic Method Set
+     *
      * @param $name
      * @param $value
      */
     public function __set($name, $value)
     {
         if (empty($this->data)) {
-            $this->data = new stdClass();
+            $this->data = new \stdClass();
         }
 
         $this->data->$name = $value;
     }
 
     /**
+     * Magic method Isset
+     *
      * @param $name
      * @return bool
      */
-    public function __isset($name)
+    public function __isset($name): bool
     {
         return isset($this->data->$name);
     }
 
     /**
+     * Magic Method Get
+     *
      * @param $name
-     * @return null
      */
     public function __get($name)
     {
@@ -95,7 +97,9 @@ abstract class Model
     }
 
     /**
-     * @return null|object
+     * Data Method
+     *
+     * @return object|null
      */
     public function data(): ?object
     {
@@ -103,14 +107,18 @@ abstract class Model
     }
 
     /**
-     * @return PDOException
+     * Fail Method
+     *
+     * @return \PDOException|null
      */
-    public function fail(): ?PDOException
+    public function fail(): ?\PDOException
     {
         return $this->fail;
     }
 
     /**
+     * Message Method
+     *
      * @return Message|null
      */
     public function message(): ?Message
@@ -138,13 +146,13 @@ abstract class Model
         return $this;
     }
 
-  /**
-   * Find By Id Method
-   *
-   * @param integer $id
-   * @param string $columns
-   * @return null|mixed|Model
-   */
+    /**
+     * Find By Id Method
+     *
+     * @param integer $id
+     * @param string $columns
+     * @return Model|null|mixed
+     */
     public function findById(int $id, string $columns = "*"): ?Model
     {
         $find = $this->find("id = :id", "id={$id}", $columns);
@@ -152,7 +160,7 @@ abstract class Model
     }
 
     /**
-     * Order Method
+     * Order Methid
      *
      * @param string $columnOrder
      * @return Model
@@ -188,7 +196,7 @@ abstract class Model
     }
 
     /**
-     * Undocumented function
+     * Fetch Method
      *
      * @param bool $all
      * @return null|array|mixed|Model
@@ -198,14 +206,17 @@ abstract class Model
         try {
             $stmt = Connect::getInstance()->prepare($this->query . $this->order . $this->limit . $this->offset);
             $stmt->execute($this->params);
+
             if (!$stmt->rowCount()) {
                 return null;
             }
+
             if ($all) {
-                return $stmt->fetchAll(PDO::FETCH_CLASS, static::class);
+                return $stmt->fetchAll(\PDO::FETCH_CLASS, static::class);
             }
+
             return $stmt->fetchObject(static::class);
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             $this->fail = $exception;
             return null;
         }
@@ -215,7 +226,7 @@ abstract class Model
      * Count Method
      *
      * @param string $key
-     * @return int
+     * @return integer
      */
     public function count(string $key = "id"): int
     {
@@ -228,7 +239,7 @@ abstract class Model
      * Create Method
      *
      * @param array $data
-     * @return int|null
+     * @return integer|null
      */
     protected function create(array $data): ?int
     {
@@ -246,15 +257,14 @@ abstract class Model
         }
     }
 
-
-   /**
-    * Update Method
-    *
-    * @param array $data
-    * @param string $terms
-    * @param string $params
-    * @return integer|null
-    */
+    /**
+     * Updated Method
+     *
+     * @param array $data
+     * @param string $terms
+     * @param string $params
+     * @return integer|null
+     */
     protected function update(array $data, string $terms, string $params): ?int
     {
         try {
@@ -268,7 +278,7 @@ abstract class Model
             $stmt = Connect::getInstance()->prepare("UPDATE " . static::$entity . " SET {$dateSet} WHERE {$terms}");
             $stmt->execute($this->filter(array_merge($data, $params)));
             return ($stmt->rowCount() ?? 1);
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             $this->fail = $exception;
             return null;
         }
@@ -277,24 +287,46 @@ abstract class Model
     /**
      * Delete Method
      *
-     * @param string $key
-     * @param string $value
+     * @param string $terms
+     * @param string|null $params
      * @return bool
      */
-    public function delete(string $key, string $value): bool
+    public function delete(string $terms, ?string $params): bool
     {
         try {
-            $stmt = Connect::getInstance()->prepare("DELETE FROM " . static::$entity . " WHERE {$key} = :key");
-            $stmt->bindValue('key', $value, PDO::PARAM_STR);
+            $stmt = Connect::getInstance()->prepare("DELETE FROM " . static::$entity . " WHERE {$terms}");
+            if ($params) {
+                parse_str($params, $params);
+                $stmt->execute($params);
+                return true;
+            }
+
             $stmt->execute();
             return true;
-        } catch (PDOException $exception) {
+        } catch (\PDOException $exception) {
             $this->fail = $exception;
             return false;
         }
     }
 
     /**
+     * Destroy Method
+     *
+     * @return bool
+     */
+    public function destroy(): bool
+    {
+        if (empty($this->id)) {
+            return false;
+        }
+
+        $destroy = $this->delete("id = :id", "id={$this->id}");
+        return $destroy;
+    }
+
+    /**
+     * Safe Method
+     *
      * @return array|null
      */
     protected function safe(): ?array
@@ -307,6 +339,8 @@ abstract class Model
     }
 
     /**
+     * Filter Method
+     *
      * @param array $data
      * @return array|null
      */
@@ -320,6 +354,8 @@ abstract class Model
     }
 
     /**
+     * Required Method
+     *
      * @return bool
      */
     protected function required(): bool

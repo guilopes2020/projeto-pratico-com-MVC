@@ -11,16 +11,14 @@ use Source\Core\Model;
 class Category extends Model
 {
     /**
-     * Category constructor
+     * Category constructor.
      */
     public function __construct()
     {
-        parent::__construct('categories', ['id'], ['title', 'id']);    
+        parent::__construct("categories", ["id"], ["title", "id"]);
     }
 
     /**
-     * Find By Uri Method
-     *
      * @param string $uri
      * @param string $columns
      * @return null|Category
@@ -31,4 +29,11 @@ class Category extends Model
         return $find->fetch();
     }
 
+    /**
+     * @return bool
+     */
+    public function save(): bool
+    {
+
+    }
 }

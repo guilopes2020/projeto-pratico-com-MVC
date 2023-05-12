@@ -13,30 +13,40 @@ use Source\Support\Message;
 class App extends Controller
 {
     /**
-     * App Constructor
+     * App constructor.
      */
     public function __construct()
     {
         parent::__construct(__DIR__ . "/../../themes/" . CONF_VIEW_APP);
 
         if (!Auth::user()) {
-            $this->message->warning('efetue login para acessar o APP')->flash();
-            redirect('/entrar');
+            $this->message->warning("Efetue login para acessar o APP.")->flash();
+            redirect("/entrar");
         }
     }
 
-    public function home()
+    /**
+     * App Home
+     *
+     * @return void
+     */
+    public function home(): void
     {
         echo flash();
         var_dump(Auth::user());
-        echo "<a title='Sair' href='" . url('/app/sair') . "'>Sair</a>";
+        echo "<a title='Sair' href='" . url("/app/sair") . "'>Sair</a>";
     }
 
-    public function logout()
+    /**
+     * App Logout
+     *
+     * @return void
+     */
+    public function logout(): void
     {
-        (new Message())->info(Auth::user()->first_name . ", voce foi deslogado com sucesso!")->flash();
-        
+        (new Message())->info("Você saiu com sucesso " . Auth::user()->first_name . ". Volte logo :)")->flash();
+
         Auth::logout();
-        redirect('/entrar');
+        redirect("/entrar");
     }
 }
