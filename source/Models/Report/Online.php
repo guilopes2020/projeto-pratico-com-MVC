@@ -25,7 +25,9 @@ class Online extends Model
     }
 
     /**
-     * @param bool $count
+     * Find By Active Method
+     *
+     * @param boolean $count
      * @return array|int|null
      */
     public function findByActive(bool $count = false)
@@ -39,7 +41,9 @@ class Online extends Model
     }
 
     /**
-     * @param bool $clear
+     * Report Online Method
+     *
+     * @param boolean $clear
      * @return Online
      */
     public function report(bool $clear = true): Online
@@ -48,7 +52,7 @@ class Online extends Model
 
         if (!$session->has("online")) {
             $this->user = ($session->authUser ?? null);
-            $this->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_STRIPPED) ?? "/");
+            $this->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_SPECIAL_CHARS) ?? "/");
             $this->ip = filter_input(INPUT_SERVER, "REMOTE_ADDR");
             $this->agent = filter_input(INPUT_SERVER, "HTTP_USER_AGENT");
 
@@ -64,7 +68,7 @@ class Online extends Model
         }
 
         $find->user = ($session->authUser ?? null);
-        $find->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_STRIPPED) ?? "/");
+        $find->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_SPECIAL_CHARS) ?? "/");
         $find->pages += 1;
         $find->save();
 
@@ -76,15 +80,19 @@ class Online extends Model
     }
 
     /**
-     * CLEAR ONLINE
+     * Clear Online Method
+     *
+     * @return void
      */
-    private function clear()
+    private function clear(): void
     {
         $this->delete("updated_at <= NOW() - INTERVAL {$this->sessionTime} MINUTE", null);
     }
 
     /**
-     * @return bool
+     * Save Online Method
+     *
+     * @return boolean
      */
     public function save(): bool
     {
