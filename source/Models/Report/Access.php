@@ -20,6 +20,8 @@ class Access extends Model
     }
 
     /**
+     * Report Method
+     *
      * @return Access
      */
     public function report(): Access
@@ -55,7 +57,9 @@ class Access extends Model
     }
 
     /**
-     * @return bool
+     * Save Access Method
+     *
+     * @return boolean
      */
     public function save(): bool
     {

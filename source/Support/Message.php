@@ -5,10 +5,8 @@ namespace Source\Support;
 use Source\Core\Session;
 
 /**
- * FSPHP | Class Message
- *
- * @author Robson V. Leite <cursos@upinside.com.br>
- * @package Source\Core
+ * Class Message
+ * @package Source\Support
  */
 class Message
 {
@@ -25,15 +23,19 @@ class Message
     private $after;
 
     /**
+     * Magic Method To String
+     *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->render();
     }
 
     /**
-     * @return string
+     * Get Text Method
+     *
+     * @return string|null
      */
     public function getText(): ?string
     {
@@ -41,7 +43,9 @@ class Message
     }
 
     /**
-     * @return string
+     * Get Type Method
+     *
+     * @return string|null
      */
     public function getType(): ?string
     {
@@ -49,6 +53,8 @@ class Message
     }
 
     /**
+     * Before Method
+     *
      * @param string $text
      * @return Message
      */
@@ -59,6 +65,8 @@ class Message
     }
 
     /**
+     * After Method
+     *
      * @param string $text
      * @return Message
      */
@@ -69,6 +77,8 @@ class Message
     }
 
     /**
+     * Info Method
+     *
      * @param string $message
      * @return Message
      */
@@ -80,6 +90,8 @@ class Message
     }
 
     /**
+     * Success Method
+     *
      * @param string $message
      * @return Message
      */
@@ -91,6 +103,8 @@ class Message
     }
 
     /**
+     * Warning Method
+     *
      * @param string $message
      * @return Message
      */
@@ -102,6 +116,8 @@ class Message
     }
 
     /**
+     * Error Method
+     *
      * @param string $message
      * @return Message
      */
@@ -113,6 +129,8 @@ class Message
     }
 
     /**
+     * Render Method
+     *
      * @return string
      */
     public function render(): string
@@ -121,6 +139,8 @@ class Message
     }
 
     /**
+     * Json Method
+     *
      * @return string
      */
     public function json(): string
@@ -129,7 +149,9 @@ class Message
     }
 
     /**
-     * Set flash Session Key
+     * Flash Method
+     *
+     * @return void
      */
     public function flash(): void
     {
@@ -137,11 +159,13 @@ class Message
     }
 
     /**
+     * Filter Method
+     *
      * @param string $message
      * @return string
      */
     private function filter(string $message): string
     {
-        return filter_var($message, FILTER_SANITIZE_STRIPPED);
+        return filter_var($message, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 }

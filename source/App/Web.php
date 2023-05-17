@@ -2,15 +2,16 @@
 
 namespace Source\App;
 
-use Source\Core\Controller;
 use Source\Models\Auth;
+use Source\Models\Post;
+use Source\Models\User;
+use Source\Support\Email;
+use Source\Support\Pager;
+use Source\Core\Controller;
 use Source\Models\Category;
 use Source\Models\Faq\Question;
-use Source\Models\Post;
 use Source\Models\Report\Access;
 use Source\Models\Report\Online;
-use Source\Models\User;
-use Source\Support\Pager;
 
 /**
  * Web Controller
@@ -153,7 +154,7 @@ class Web extends Controller
     public function blogSearch(array $data): void
     {
         if (!empty($data['s'])) {
-            $search = filter_var($data['s'], FILTER_SANITIZE_STRIPPED);
+            $search = filter_var($data['s'], FILTER_SANITIZE_SPECIAL_CHARS);
             echo json_encode(["redirect" => url("/blog/buscar/{$search}/1")]);
             return;
         }
@@ -162,7 +163,7 @@ class Web extends Controller
             redirect("/blog");
         }
 
-        $search = filter_var($data['terms'], FILTER_SANITIZE_STRIPPED);
+        $search = filter_var($data['terms'], FILTER_SANITIZE_SPECIAL_CHARS);
         $page = (filter_var($data['page'], FILTER_VALIDATE_INT) >= 1 ? $data['page'] : 1);
 
         $head = $this->seo->render(
@@ -289,7 +290,7 @@ class Web extends Controller
      * @param array|null $data
      * @return void
      */
-    public function forget(?array $data)
+    public function forget(?array $data): void
     {
         if (!empty($data['csrf'])) {
             if (!csrf_verify($data)) {
