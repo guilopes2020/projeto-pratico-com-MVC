@@ -23,8 +23,7 @@ class Controller
     protected $message;
 
     /**
-     * Controller Constructor
-     *
+     * Controller constructor.
      * @param string|null $pathToViews
      */
     public function __construct(string $pathToViews = null)

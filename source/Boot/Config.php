@@ -3,7 +3,6 @@
  * DATABASE
  */
 define("CONF_DB_HOST", "localhost");
-define("CONF_DB_PORT", "3306");
 define("CONF_DB_USER", "guilopes");
 define("CONF_DB_PASS", "password");
 define("CONF_DB_NAME", "fullstackphp");
@@ -13,7 +12,6 @@ define("CONF_DB_NAME", "fullstackphp");
  */
 define("CONF_URL_BASE", "https://www.cafecontrol.com.br");
 define("CONF_URL_TEST", "https://www.localhost/projeto-pratico-com-MVC");
-define("CONF_URL_ADMIN", "/admin");
 
 /**
  * SITE
@@ -65,6 +63,7 @@ define("CONF_VIEW_PATH", __DIR__ . "/../../shared/views");
 define("CONF_VIEW_EXT", "php");
 define("CONF_VIEW_THEME", "cafeweb");
 define("CONF_VIEW_APP", "cafeapp");
+define("CONF_VIEW_ADMIN", "cafeadm");
 
 /**
  * UPLOAD
@@ -98,3 +97,11 @@ define("CONF_MAIL_OPTION_HTML", true);
 define("CONF_MAIL_OPTION_AUTH", true);
 define("CONF_MAIL_OPTION_SECURE", "tls");
 define("CONF_MAIL_OPTION_CHARSET", "utf-8");
+
+/**
+ * PAGAR.ME
+ */
+define("CONF_PAGARME_MODE", "test");
+define("CONF_PAGARME_LIVE", "ak_live_*****");
+define("CONF_PAGARME_TEST", "ak_test_*****");
+define("CONF_PAGARME_BACK", CONF_URL_BASE . "/pay/callback");

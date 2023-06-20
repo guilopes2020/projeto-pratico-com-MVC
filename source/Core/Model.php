@@ -37,13 +37,13 @@ abstract class Model
     protected $offset;
 
     /** @var string $entity database table */
-    protected static $entity;
+    protected $entity;
 
     /** @var array $protected no update or create */
-    protected static $protected;
+    protected $protected;
 
     /** @var array $entity database table */
-    protected static $required;
+    protected $required;
 
     /**
      * Model constructor.
@@ -53,16 +53,13 @@ abstract class Model
      */
     public function __construct(string $entity, array $protected, array $required)
     {
-        self::$entity = $entity;
-        self::$protected = array_merge($protected, ['created_at', "updated_at"]);
-        self::$required = $required;
-
+        $this->entity = $entity;
+        $this->protected = array_merge($protected, ['created_at', "updated_at"]);
+        $this->required = $required;
         $this->message = new Message();
     }
 
     /**
-     * Magic Method Set
-     *
      * @param $name
      * @param $value
      */
@@ -76,20 +73,17 @@ abstract class Model
     }
 
     /**
-     * Magic method Isset
-     *
      * @param $name
      * @return bool
      */
-    public function __isset($name): bool
+    public function __isset($name)
     {
         return isset($this->data->$name);
     }
 
     /**
-     * Magic Method Get
-     *
      * @param $name
+     * @return null
      */
     public function __get($name)
     {
@@ -97,9 +91,7 @@ abstract class Model
     }
 
     /**
-     * Data Method
-     *
-     * @return object|null
+     * @return null|object
      */
     public function data(): ?object
     {
@@ -107,9 +99,7 @@ abstract class Model
     }
 
     /**
-     * Fail Method
-     *
-     * @return \PDOException|null
+     * @return \PDOException
      */
     public function fail(): ?\PDOException
     {
@@ -117,8 +107,6 @@ abstract class Model
     }
 
     /**
-     * Message Method
-     *
      * @return Message|null
      */
     public function message(): ?Message
@@ -127,31 +115,27 @@ abstract class Model
     }
 
     /**
-     * Find Method
-     *
-     * @param string|null $terms
-     * @param string|null $params
+     * @param null|string $terms
+     * @param null|string $params
      * @param string $columns
      * @return Model|mixed
      */
     public function find(?string $terms = null, ?string $params = null, string $columns = "*")
     {
         if ($terms) {
-            $this->query = "SELECT {$columns} FROM " . static::$entity . " WHERE {$terms}";
+            $this->query = "SELECT {$columns} FROM {$this->entity} WHERE {$terms}";
             parse_str($params, $this->params);
             return $this;
         }
 
-        $this->query = "SELECT {$columns} FROM " . static::$entity;
+        $this->query = "SELECT {$columns} FROM {$this->entity}";
         return $this;
     }
 
     /**
-     * Find By Id Method
-     *
-     * @param integer $id
+     * @param int $id
      * @param string $columns
-     * @return Model|null|mixed
+     * @return null|mixed|Model
      */
     public function findById(int $id, string $columns = "*"): ?Model
     {
@@ -160,8 +144,6 @@ abstract class Model
     }
 
     /**
-     * Order Methid
-     *
      * @param string $columnOrder
      * @return Model
      */
@@ -172,9 +154,7 @@ abstract class Model
     }
 
     /**
-     * Limit Method
-     *
-     * @param integer $limit
+     * @param int $limit
      * @return Model
      */
     public function limit(int $limit): Model
@@ -184,9 +164,7 @@ abstract class Model
     }
 
     /**
-     * Offset Method
-     *
-     * @param integer $offset
+     * @param int $offset
      * @return Model
      */
     public function offset(int $offset): Model
@@ -196,8 +174,6 @@ abstract class Model
     }
 
     /**
-     * Fetch Method
-     *
      * @param bool $all
      * @return null|array|mixed|Model
      */
@@ -223,10 +199,8 @@ abstract class Model
     }
 
     /**
-     * Count Method
-     *
      * @param string $key
-     * @return integer
+     * @return int
      */
     public function count(string $key = "id"): int
     {
@@ -236,10 +210,8 @@ abstract class Model
     }
 
     /**
-     * Create Method
-     *
      * @param array $data
-     * @return integer|null
+     * @return int|null
      */
     protected function create(array $data): ?int
     {
@@ -247,7 +219,7 @@ abstract class Model
             $columns = implode(", ", array_keys($data));
             $values = ":" . implode(", :", array_keys($data));
 
-            $stmt = Connect::getInstance()->prepare("INSERT INTO " . static::$entity . " ({$columns}) VALUES ({$values})");
+            $stmt = Connect::getInstance()->prepare("INSERT INTO {$this->entity} ({$columns}) VALUES ({$values})");
             $stmt->execute($this->filter($data));
 
             return Connect::getInstance()->lastInsertId();
@@ -258,12 +230,10 @@ abstract class Model
     }
 
     /**
-     * Updated Method
-     *
      * @param array $data
      * @param string $terms
      * @param string $params
-     * @return integer|null
+     * @return int|null
      */
     protected function update(array $data, string $terms, string $params): ?int
     {
@@ -275,7 +245,7 @@ abstract class Model
             $dateSet = implode(", ", $dateSet);
             parse_str($params, $params);
 
-            $stmt = Connect::getInstance()->prepare("UPDATE " . static::$entity . " SET {$dateSet} WHERE {$terms}");
+            $stmt = Connect::getInstance()->prepare("UPDATE {$this->entity} SET {$dateSet} WHERE {$terms}");
             $stmt->execute($this->filter(array_merge($data, $params)));
             return ($stmt->rowCount() ?? 1);
         } catch (\PDOException $exception) {
@@ -285,16 +255,55 @@ abstract class Model
     }
 
     /**
-     * Delete Method
-     *
+     * @return bool
+     */
+    public function save(): bool
+    {
+        if (!$this->required()) {
+            $this->message->warning("Preencha todos os campos para continuar");
+            return false;
+        }
+
+        /** Update */
+        if (!empty($this->id)) {
+            $id = $this->id;
+            $this->update($this->safe(), "id = :id", "id={$id}");
+            if ($this->fail()) {
+                $this->message->error("Erro ao atualizar, verifique os dados");
+                return false;
+            }
+        }
+
+        /** Create */
+        if (empty($this->id)) {
+            $id = $this->create($this->safe());
+            if ($this->fail()) {
+                $this->message->error("Erro ao cadastrar, verifique os dados");
+                return false;
+            }
+        }
+
+        $this->data = $this->findById($id)->data();
+        return true;
+    }
+
+    /**
+     * @return int
+     */
+    public function lastId(): int
+    {
+        return Connect::getInstance()->query("SELECT MAX(id) as maxId FROM {$this->entity}")->fetch()->maxId + 1;
+    }
+
+    /**
      * @param string $terms
-     * @param string|null $params
+     * @param null|string $params
      * @return bool
      */
     public function delete(string $terms, ?string $params): bool
     {
         try {
-            $stmt = Connect::getInstance()->prepare("DELETE FROM " . static::$entity . " WHERE {$terms}");
+            $stmt = Connect::getInstance()->prepare("DELETE FROM {$this->entity} WHERE {$terms}");
             if ($params) {
                 parse_str($params, $params);
                 $stmt->execute($params);
@@ -310,8 +319,6 @@ abstract class Model
     }
 
     /**
-     * Destroy Method
-     *
      * @return bool
      */
     public function destroy(): bool
@@ -325,22 +332,18 @@ abstract class Model
     }
 
     /**
-     * Safe Method
-     *
      * @return array|null
      */
     protected function safe(): ?array
     {
         $safe = (array)$this->data;
-        foreach (static::$protected as $unset) {
+        foreach ($this->protected as $unset) {
             unset($safe[$unset]);
         }
         return $safe;
     }
 
     /**
-     * Filter Method
-     *
      * @param array $data
      * @return array|null
      */
@@ -354,14 +357,12 @@ abstract class Model
     }
 
     /**
-     * Required Method
-     *
      * @return bool
      */
     protected function required(): bool
     {
         $data = (array)$this->data();
-        foreach (static::$required as $field) {
+        foreach ($this->required as $field) {
             if (empty($data[$field])) {
                 return false;
             }

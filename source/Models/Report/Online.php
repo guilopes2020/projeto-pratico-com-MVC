@@ -4,6 +4,7 @@ namespace Source\Models\Report;
 
 use Source\Core\Model;
 use Source\Core\Session;
+use Source\Models\User;
 
 /**
  * Class Online
@@ -25,9 +26,7 @@ class Online extends Model
     }
 
     /**
-     * Find By Active Method
-     *
-     * @param boolean $count
+     * @param bool $count
      * @return array|int|null
      */
     public function findByActive(bool $count = false)
@@ -37,22 +36,25 @@ class Online extends Model
             return $find->count();
         }
 
+        $find->order("updated_at DESC");
         return $find->fetch(true);
     }
 
     /**
-     * Report Online Method
-     *
-     * @param boolean $clear
+     * @param bool $clear
      * @return Online
      */
     public function report(bool $clear = true): Online
     {
         $session = new Session();
 
+        if ($clear) {
+            $this->clear();
+        }
+
         if (!$session->has("online")) {
             $this->user = ($session->authUser ?? null);
-            $this->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_SPECIAL_CHARS) ?? "/");
+            $this->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_STRIPPED) ?? "/");
             $this->ip = filter_input(INPUT_SERVER, "REMOTE_ADDR");
             $this->agent = filter_input(INPUT_SERVER, "HTTP_USER_AGENT");
 
@@ -68,54 +70,26 @@ class Online extends Model
         }
 
         $find->user = ($session->authUser ?? null);
-        $find->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_SPECIAL_CHARS) ?? "/");
+        $find->url = (filter_input(INPUT_GET, "route", FILTER_SANITIZE_STRIPPED) ?? "/");
         $find->pages += 1;
         $find->save();
-
-        if ($clear) {
-            $this->clear();
-        }
 
         return $this;
     }
 
     /**
-     * Clear Online Method
-     *
-     * @return void
+     * CLEAR ONLINE
      */
-    private function clear(): void
+    private function clear()
     {
         $this->delete("updated_at <= NOW() - INTERVAL {$this->sessionTime} MINUTE", null);
     }
 
     /**
-     * Save Online Method
-     *
-     * @return boolean
+     * @return mixed|Model|null
      */
-    public function save(): bool
+    public function user()
     {
-        /** Update Access */
-        if (!empty($this->id)) {
-            $onlineId = $this->id;
-            $this->update($this->safe(), "id = :id", "id={$onlineId}");
-            if ($this->fail()) {
-                $this->message->error("Erro ao atualizar, verifique os dados");
-                return false;
-            }
-        }
-
-        /** Create Access */
-        if (empty($this->id)) {
-            $onlineId = $this->create($this->safe());
-            if ($this->fail()) {
-                $this->message->error("Erro ao cadastrar, verifique os dados");
-                return false;
-            }
-        }
-
-        $this->data = $this->findById($onlineId)->data();
-        return true;
+        return (new User())->findById($this->user);
     }
 }

@@ -20,8 +20,6 @@ class Access extends Model
     }
 
     /**
-     * Report Method
-     *
      * @return Access
      */
     public function report(): Access
@@ -54,35 +52,5 @@ class Access extends Model
         $find->pages += 1;
         $find->save();
         return $this;
-    }
-
-    /**
-     * Save Access Method
-     *
-     * @return boolean
-     */
-    public function save(): bool
-    {
-        /** Update Access */
-        if (!empty($this->id)) {
-            $accessId = $this->id;
-            $this->update($this->safe(), "id = :id", "id={$accessId}");
-            if ($this->fail()) {
-                $this->message->error("Erro ao atualizar, verifique os dados");
-                return false;
-            }
-        }
-
-        /** Create Access */
-        if (empty($this->id)) {
-            $accessId = $this->create($this->safe());
-            if ($this->fail()) {
-                $this->message->error("Erro ao cadastrar, verifique os dados");
-                return false;
-            }
-        }
-
-        $this->data = $this->findById($accessId)->data();
-        return true;
     }
 }

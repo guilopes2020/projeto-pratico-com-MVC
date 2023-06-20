@@ -2,16 +2,15 @@
 
 namespace Source\App;
 
-use Source\Models\Auth;
-use Source\Models\Post;
-use Source\Models\User;
-use Source\Support\Email;
-use Source\Support\Pager;
 use Source\Core\Controller;
+use Source\Models\Auth;
 use Source\Models\Category;
 use Source\Models\Faq\Question;
+use Source\Models\Post;
 use Source\Models\Report\Access;
 use Source\Models\Report\Online;
+use Source\Models\User;
+use Source\Support\Pager;
 
 /**
  * Web Controller
@@ -30,11 +29,9 @@ class Web extends Controller
         (new Online())->report();
     }
 
-   /**
-    * Site Home
-    *
-    * @return void
-    */
+    /**
+     * SITE HOME
+     */
     public function home(): void
     {
         $head = $this->seo->render(
@@ -45,10 +42,10 @@ class Web extends Controller
         );
 
         echo $this->view->render("home", [
-            "head"  => $head,
+            "head" => $head,
             "video" => "lDZGl9Wdc7Y",
-            "blog"  => (new Post())
-                ->find()
+            "blog" => (new Post())
+                ->findPost()
                 ->order("post_at DESC")
                 ->limit(6)
                 ->fetch(true)
@@ -56,9 +53,7 @@ class Web extends Controller
     }
 
     /**
-     * Site About
-     *
-     * @return void
+     * SITE ABOUT
      */
     public function about(): void
     {
@@ -70,9 +65,9 @@ class Web extends Controller
         );
 
         echo $this->view->render("about", [
-            "head"  => $head,
+            "head" => $head,
             "video" => "lDZGl9Wdc7Y",
-            "faq"   => (new Question())
+            "faq" => (new Question())
                 ->find("channel_id = :id", "id=1", "question, response")
                 ->order("order_by")
                 ->fetch(true)
@@ -80,10 +75,8 @@ class Web extends Controller
     }
 
     /**
-     * Site Blog
-     *
+     * SITE BLOG
      * @param array|null $data
-     * @return void
      */
     public function blog(?array $data): void
     {
@@ -94,33 +87,31 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        $blog = (new Post())->find();
+        $blog = (new Post())->findPost();
         $pager = new Pager(url("/blog/p/"));
         $pager->pager($blog->count(), 9, ($data['page'] ?? 1));
 
         echo $this->view->render("blog", [
-            "head"      => $head,
-            "blog"      => $blog->limit($pager->limit())->offset($pager->offset())->fetch(true),
+            "head" => $head,
+            "blog" => $blog->order("post_at DESC")->limit($pager->limit())->offset($pager->offset())->fetch(true),
             "paginator" => $pager->render()
         ]);
     }
 
     /**
-     * Site Blog Category
-     *
+     * SITE BLOG CATEGORY
      * @param array $data
-     * @return void
      */
     public function blogCategory(array $data): void
     {
-        $categoryUri = filter_var($data["category"], FILTER_SANITIZE_SPECIAL_CHARS);
+        $categoryUri = filter_var($data["category"], FILTER_SANITIZE_STRIPPED);
         $category = (new Category())->findByUri($categoryUri);
 
         if (!$category) {
             redirect("/blog");
         }
 
-        $blogCategory = (new Post())->find("category = :c", "c={$category->id}");
+        $blogCategory = (new Post())->findPost("category = :c", "c={$category->id}");
         $page = (!empty($data['page']) && filter_var($data['page'], FILTER_VALIDATE_INT) >= 1 ? $data['page'] : 1);
         $pager = new Pager(url("/blog/em/{$category->uri}/"));
         $pager->pager($blogCategory->count(), 9, $page);
@@ -133,10 +124,10 @@ class Web extends Controller
         );
 
         echo $this->view->render("blog", [
-            "head"      => $head,
-            "title"     => "Artigos em {$category->title}",
-            "desc"      => $category->description,
-            "blog"      => $blogCategory
+            "head" => $head,
+            "title" => "Artigos em {$category->title}",
+            "desc" => $category->description,
+            "blog" => $blogCategory
                 ->limit($pager->limit())
                 ->offset($pager->offset())
                 ->order("post_at DESC")
@@ -146,25 +137,23 @@ class Web extends Controller
     }
 
     /**
-     * Site Blog Search
-     *
+     * SITE BLOG SEARCH
      * @param array $data
-     * @return void
      */
     public function blogSearch(array $data): void
     {
         if (!empty($data['s'])) {
-            $search = filter_var($data['s'], FILTER_SANITIZE_SPECIAL_CHARS);
+            $search = str_search($data['s']);
             echo json_encode(["redirect" => url("/blog/buscar/{$search}/1")]);
             return;
         }
 
-        if (empty($data['terms'])) {
+        $search = str_search($data['search']);
+        $page = (filter_var($data['page'], FILTER_VALIDATE_INT) >= 1 ? $data['page'] : 1);
+
+        if ($search == "all") {
             redirect("/blog");
         }
-
-        $search = filter_var($data['terms'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $page = (filter_var($data['page'], FILTER_VALIDATE_INT) >= 1 ? $data['page'] : 1);
 
         $head = $this->seo->render(
             "Pesquisa por {$search} - " . CONF_SITE_NAME,
@@ -173,12 +162,12 @@ class Web extends Controller
             theme("/assets/images/share.jpg")
         );
 
-        $blogSearch = (new Post())->find("MATCH(title, subtitle) AGAINST(:s)", "s={$search}");
+        $blogSearch = (new Post())->findPost("MATCH(title, subtitle) AGAINST(:s)", "s={$search}");
 
         if (!$blogSearch->count()) {
             echo $this->view->render("blog", [
-                "head"   => $head,
-                "title"  => "PESQUISA POR:",
+                "head" => $head,
+                "title" => "PESQUISA POR:",
                 "search" => $search
             ]);
             return;
@@ -188,19 +177,17 @@ class Web extends Controller
         $pager->pager($blogSearch->count(), 9, $page);
 
         echo $this->view->render("blog", [
-            "head"      => $head,
-            "title"     => "PESQUISA POR:",
-            "search"    => $search,
-            "blog"      => $blogSearch->limit($pager->limit())->offset($pager->offset())->fetch(true),
+            "head" => $head,
+            "title" => "PESQUISA POR:",
+            "search" => $search,
+            "blog" => $blogSearch->limit($pager->limit())->offset($pager->offset())->fetch(true),
             "paginator" => $pager->render()
         ]);
     }
 
     /**
-     * Site Blog Post
-     *
+     * SITE BLOG POST
      * @param array $data
-     * @return void
      */
     public function blogPost(array $data): void
     {
@@ -209,21 +196,24 @@ class Web extends Controller
             redirect("/404");
         }
 
-        $post->views += 1;
-        $post->save();
+        $user = Auth::user();
+        if (!$user || $user->level < 5) {
+            $post->views += 1;
+            $post->save();
+        }
 
         $head = $this->seo->render(
             "{$post->title} - " . CONF_SITE_NAME,
             $post->subtitle,
             url("/blog/{$post->uri}"),
-            image($post->cover, 1200, 628)
+            ($post->cover ? image($post->cover, 1200, 628) : theme("/assets/images/share.jpg"))
         );
 
         echo $this->view->render("blog-post", [
-            "head"    => $head,
-            "post"    => $post,
+            "head" => $head,
+            "post" => $post,
             "related" => (new Post())
-                ->find("category = :c AND id != :i", "c={$post->category}&i={$post->id}")
+                ->findPost("category = :c AND id != :i", "c={$post->category}&i={$post->id}")
                 ->order("rand()")
                 ->limit(3)
                 ->fetch(true)
@@ -231,13 +221,15 @@ class Web extends Controller
     }
 
     /**
-     * Site Login
-     *
-     * @param array|null $data
-     * @return void
+     * SITE LOGIN
+     * @param null|array $data
      */
     public function login(?array $data): void
     {
+        if (Auth::user()) {
+            redirect("/app");
+        }
+
         if (!empty($data['csrf'])) {
             if (!csrf_verify($data)) {
                 $json['message'] = $this->message->error("Erro ao enviar, favor use o formulário")->render();
@@ -262,6 +254,7 @@ class Web extends Controller
             $login = $auth->login($data['email'], $data['password'], $save);
 
             if ($login) {
+                $this->message->success("Seja bem-vindo(a) de volta " . Auth::user()->first_name . "!")->flash();
                 $json['redirect'] = url("/app");
             } else {
                 $json['message'] = $auth->message()->before("Ooops! ")->render();
@@ -279,19 +272,21 @@ class Web extends Controller
         );
 
         echo $this->view->render("auth-login", [
-            "head"   => $head,
+            "head" => $head,
             "cookie" => filter_input(INPUT_COOKIE, "authEmail")
         ]);
     }
 
     /**
-     * Site Password Forget
-     *
-     * @param array|null $data
-     * @return void
+     * SITE PASSWORD FORGET
+     * @param null|array $data
      */
-    public function forget(?array $data): void
+    public function forget(?array $data)
     {
+        if (Auth::user()) {
+            redirect("/app");
+        }
+
         if (!empty($data['csrf'])) {
             if (!csrf_verify($data)) {
                 $json['message'] = $this->message->error("Erro ao enviar, favor use o formulário")->render();
@@ -335,13 +330,15 @@ class Web extends Controller
     }
 
     /**
-     * Site Forget Reset
-     *
+     * SITE FORGET RESET
      * @param array $data
-     * @return void
      */
     public function reset(array $data): void
     {
+        if (Auth::user()) {
+            redirect("/app");
+        }
+
         if (!empty($data['csrf'])) {
             if (!csrf_verify($data)) {
                 $json['message'] = $this->message->error("Erro ao enviar, favor use o formulário")->render();
@@ -383,13 +380,15 @@ class Web extends Controller
     }
 
     /**
-     * Site Register
-     *
-     * @param array|null $data
-     * @return void
+     * SITE REGISTER
+     * @param null|array $data
      */
     public function register(?array $data): void
     {
+        if (Auth::user()) {
+            redirect("/app");
+        }
+
         if (!empty($data['csrf'])) {
             if (!csrf_verify($data)) {
                 $json['message'] = $this->message->error("Erro ao enviar, favor use o formulário")->render();
@@ -435,9 +434,7 @@ class Web extends Controller
     }
 
     /**
-     * Site Opt-In Confirm
-     *
-     * @return void
+     * SITE OPT-IN CONFIRM
      */
     public function confirm(): void
     {
@@ -452,17 +449,15 @@ class Web extends Controller
             "head" => $head,
             "data" => (object)[
                 "title" => "Falta pouco! Confirme seu cadastro.",
-                "desc"  => "Enviamos um link de confirmação para seu e-mail. Acesse e siga as instruções para concluir seu cadastro e comece a controlar com o CaféControl",
+                "desc" => "Enviamos um link de confirmação para seu e-mail. Acesse e siga as instruções para concluir seu cadastro e comece a controlar com o CaféControl",
                 "image" => theme("/assets/images/optin-confirm.jpg")
             ]
         ]);
     }
 
     /**
-     * Site Opt-In Success
-     *
+     * SITE OPT-IN SUCCESS
      * @param array $data
-     * @return void
      */
     public function success(array $data): void
     {
@@ -482,12 +477,12 @@ class Web extends Controller
         );
 
         echo $this->view->render("optin", [
-            "head"  => $head,
-            "data"  => (object)[
-                "title"     => "Tudo pronto. Você já pode controlar :)",
-                "desc"      => "Bem-vindo(a) ao seu controle de contas, vamos tomar um café?",
-                "image"     => theme("/assets/images/optin-success.jpg"),
-                "link"      => url("/entrar"),
+            "head" => $head,
+            "data" => (object)[
+                "title" => "Tudo pronto. Você já pode controlar :)",
+                "desc" => "Bem-vindo(a) ao seu controle de contas, vamos tomar um café?",
+                "image" => theme("/assets/images/optin-success.jpg"),
+                "link" => url("/entrar"),
                 "linkTitle" => "Fazer Login"
             ],
             "track" => (object)[
@@ -498,9 +493,7 @@ class Web extends Controller
     }
 
     /**
-     * Site Terms
-     *
-     * @return void
+     * SITE TERMS
      */
     public function terms(): void
     {
@@ -517,10 +510,8 @@ class Web extends Controller
     }
 
     /**
-     * Site Nav Error
-     *
+     * SITE NAV ERROR
      * @param array $data
-     * @return void
      */
     public function error(array $data): void
     {
@@ -561,7 +552,7 @@ class Web extends Controller
         );
 
         echo $this->view->render("error", [
-            "head"  => $head,
+            "head" => $head,
             "error" => $error
         ]);
     }

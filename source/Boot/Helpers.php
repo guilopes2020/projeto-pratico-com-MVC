@@ -7,10 +7,8 @@
  */
 
 /**
- * Is Email Mehod Helper
- *
  * @param string $email
- * @return boolean
+ * @return bool
  */
 function is_email(string $email): bool
 {
@@ -18,10 +16,8 @@ function is_email(string $email): bool
 }
 
 /**
- * Is Password Helper
- *
  * @param string $password
- * @return boolean
+ * @return bool
  */
 function is_passwd(string $password): bool
 {
@@ -39,8 +35,6 @@ function is_passwd(string $password): bool
  */
 
 /**
- * Str Slug Helper
- *
  * @param string $string
  * @return string
  */
@@ -59,8 +53,6 @@ function str_slug(string $string): string
 }
 
 /**
- * Str Studly Case Helper
- *
  * @param string $string
  * @return string
  */
@@ -75,8 +67,6 @@ function str_studly_case(string $string): string
 }
 
 /**
- * Str Camel Case Helper
- *
  * @param string $string
  * @return string
  */
@@ -86,8 +76,6 @@ function str_camel_case(string $string): string
 }
 
 /**
- * Str Title Helper
- *
  * @param string $string
  * @return string
  */
@@ -97,10 +85,19 @@ function str_title(string $string): string
 }
 
 /**
- * Str Limit Words Helper
- *
+ * @param string $text
+ * @return string
+ */
+function str_textarea(string $text): string
+{
+    $text = filter_var($text, FILTER_SANITIZE_STRIPPED);
+    $arrayReplace = ["&#10;", "&#10;&#10;", "&#10;&#10;&#10;", "&#10;&#10;&#10;&#10;", "&#10;&#10;&#10;&#10;&#10;"];
+    return "<p>" . str_replace($arrayReplace, "</p><p>", $text) . "</p>";
+}
+
+/**
  * @param string $string
- * @param integer $limit
+ * @param int $limit
  * @param string $pointer
  * @return string
  */
@@ -119,10 +116,8 @@ function str_limit_words(string $string, int $limit, string $pointer = "..."): s
 }
 
 /**
- * Str Limit CHars Helper
- *
  * @param string $string
- * @param integer $limit
+ * @param int $limit
  * @param string $pointer
  * @return string
  */
@@ -138,15 +133,36 @@ function str_limit_chars(string $string, int $limit, string $pointer = "..."): s
 }
 
 /**
+ * @param string $price
+ * @return string
+ */
+function str_price(?string $price): string
+{
+    return number_format((!empty($price) ? $price : 0), 2, ",", ".");
+}
+
+/**
+ * @param string|null $search
+ * @return string
+ */
+function str_search(?string $search): string
+{
+    if (!$search) {
+        return "all";
+    }
+
+    $search = preg_replace("/[^a-z0-9A-Z\@\ ]/", "", $search);
+    return (!empty($search) ? $search : "all");
+}
+
+/**
  * ###############
  * ###   URL   ###
  * ###############
  */
 
 /**
- * Url Helper
- *
- * @param string|null $path
+ * @param string $path
  * @return string
  */
 function url(string $path = null): string
@@ -166,8 +182,6 @@ function url(string $path = null): string
 }
 
 /**
- * Url Back Helper
- *
  * @return string
  */
 function url_back(): string
@@ -176,10 +190,7 @@ function url_back(): string
 }
 
 /**
- * Redirect Method Helper
- *
  * @param string $url
- * @return void
  */
 function redirect(string $url): void
 {
@@ -203,39 +214,56 @@ function redirect(string $url): void
  */
 
 /**
- * Theme Method Helper
- *
- * @param string|null $path
- * @return string
+ * @return \Source\Models\User|null
  */
-function theme(string $path = null): string
+function user(): ?\Source\Models\User
 {
-    if (strpos($_SERVER['HTTP_HOST'], "localhost")) {
-        if ($path) {
-            return CONF_URL_TEST . "/themes/" . CONF_VIEW_THEME . "/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
-        }
-
-        return CONF_URL_TEST . "/themes/" . CONF_VIEW_THEME;
-    }
-
-    if ($path) {
-        return CONF_URL_BASE . "/themes/" . CONF_VIEW_THEME . "/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
-    }
-
-    return CONF_URL_BASE . "/themes/" . CONF_VIEW_THEME;
+    return \Source\Models\Auth::user();
 }
 
 /**
- * Image Method Helper
- *
- * @param string $image
- * @param integer $width
- * @param integer|null $height
+ * @return \Source\Core\Session
+ */
+function session(): \Source\Core\Session
+{
+    return new \Source\Core\Session();
+}
+
+/**
+ * @param string|null $path
+ * @param string $theme
  * @return string
  */
-function image(string $image, int $width, int $height = null): string
+function theme(string $path = null, string $theme = CONF_VIEW_THEME): string
 {
-    return url() . "/" . (new \Source\Support\Thumb())->make($image, $width, $height);
+    if (strpos($_SERVER['HTTP_HOST'], "localhost")) {
+        if ($path) {
+            return CONF_URL_TEST . "/themes/{$theme}/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
+        }
+
+        return CONF_URL_TEST . "/themes/{$theme}";
+    }
+
+    if ($path) {
+        return CONF_URL_BASE . "/themes/{$theme}/" . ($path[0] == "/" ? mb_substr($path, 1) : $path);
+    }
+
+    return CONF_URL_BASE . "/themes/{$theme}";
+}
+
+/**
+ * @param string $image
+ * @param int $width
+ * @param int|null $height
+ * @return string
+ */
+function image(?string $image, int $width, int $height = null): ?string
+{
+    if ($image) {
+        return url() . "/" . (new \Source\Support\Thumb())->make($image, $width, $height);
+    }
+
+    return null;
 }
 
 /**
@@ -245,37 +273,55 @@ function image(string $image, int $width, int $height = null): string
  */
 
 /**
- * Date Format Method Helper
- *
  * @param string $date
  * @param string $format
  * @return string
+ * @throws Exception
  */
-function date_fmt(string $date = "now", string $format = "d/m/Y H\hi"): string
+function date_fmt(?string $date, string $format = "d/m/Y H\hi"): string
 {
+    $date = (empty($date) ? "now" : $date);
     return (new DateTime($date))->format($format);
 }
 
 /**
- * Date Format_BR Method Helper
- *
  * @param string $date
  * @return string
+ * @throws Exception
  */
-function date_fmt_br(string $date = "now"): string
+function date_fmt_br(?string $date): string
 {
+    $date = (empty($date) ? "now" : $date);
     return (new DateTime($date))->format(CONF_DATE_BR);
 }
 
 /**
- * Date Format App Method Helper
- *
  * @param string $date
  * @return string
+ * @throws Exception
  */
-function date_fmt_app(string $date = "now"): string
+function date_fmt_app(?string $date): string
 {
+    $date = (empty($date) ? "now" : $date);
     return (new DateTime($date))->format(CONF_DATE_APP);
+}
+
+/**
+ * @param string|null $date
+ * @return string|null
+ */
+function date_fmt_back(?string $date): ?string
+{
+    if (!$date) {
+        return null;
+    }
+
+    if (strpos($date, " ")) {
+        $date = explode(" ", $date);
+        return implode("-", array_reverse(explode("/", $date[0]))) . " " . $date[1];
+    }
+
+    return implode("-", array_reverse(explode("/", $date)));
 }
 
 /**
@@ -285,8 +331,6 @@ function date_fmt_app(string $date = "now"): string
  */
 
 /**
- * Password Method Helper
- *
  * @param string $password
  * @return string
  */
@@ -300,8 +344,6 @@ function passwd(string $password): string
 }
 
 /**
- * Password Verify Method Helper
- *
  * @param string $password
  * @param string $hash
  * @return bool
@@ -312,8 +354,6 @@ function passwd_verify(string $password, string $hash): bool
 }
 
 /**
- * Password He-Hash Method Helper
- *
  * @param string $hash
  * @return bool
  */
@@ -329,8 +369,6 @@ function passwd_rehash(string $hash): bool
  */
 
 /**
- * Csrf Input Method Helper
- *
  * @return string
  */
 function csrf_input(): string
@@ -341,8 +379,6 @@ function csrf_input(): string
 }
 
 /**
- * Csrf Verify Method Helper
- *
  * @param $request
  * @return bool
  */
@@ -356,9 +392,7 @@ function csrf_verify($request): bool
 }
 
 /**
- * Flash Method Helper
- *
- * @return string|null
+ * @return null|string
  */
 function flash(): ?string
 {
@@ -370,11 +404,9 @@ function flash(): ?string
 }
 
 /**
- * Request Limit Method Helper
- *
  * @param string $key
- * @param integer $limit
- * @param integer $seconds
+ * @param int $limit
+ * @param int $seconds
  * @return bool
  */
 function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
@@ -382,7 +414,7 @@ function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
     $session = new \Source\Core\Session();
     if ($session->has($key) && $session->$key->time >= time() && $session->$key->requests < $limit) {
         $session->set($key, [
-            "time"     => time() + $seconds,
+            "time" => time() + $seconds,
             "requests" => $session->$key->requests + 1
         ]);
         return false;
@@ -393,7 +425,7 @@ function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
     }
 
     $session->set($key, [
-        "time"     => time() + $seconds,
+        "time" => time() + $seconds,
         "requests" => 1
     ]);
 
@@ -401,8 +433,6 @@ function request_limit(string $key, int $limit = 5, int $seconds = 60): bool
 }
 
 /**
- * Request Repeat Method Helper
- *
  * @param string $field
  * @param string $value
  * @return bool
