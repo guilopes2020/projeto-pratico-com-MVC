@@ -1,12 +1,12 @@
 {
-  "name": "guilopes/control",
-  "description": "Controle de receitas e despesas",
+  "name": "upinside/fsphp",
+  "description": "Formação Full Stack PHP Developer",
   "minimum-stability": "stable",
   "authors": [
     {
-      "name": "Guilherme Lopes",
-      "email": "guilopesdev@gmail.com",
-      "homepage": "https://github.com/guilopes2020",
+      "name": "Robson V. Leite",
+      "email": "cursos@upinside.com.br",
+      "homepage": "https://www.upinside.com.br",
       "role": "Developer"
     }
   ],
@@ -20,7 +20,8 @@
     "files": [
       "source/Boot/Config.php",
       "source/Boot/Helpers.php",
-      "source/Boot/Minify.php"
+      "source/Boot/Minify/Web.php",
+      "source/Boot/Minify/App.php"
     ]
   },
   "require": {

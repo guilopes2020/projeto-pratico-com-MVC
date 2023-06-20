@@ -15,7 +15,7 @@ class Category extends Model
      */
     public function __construct()
     {
-        parent::__construct("categories", ["id"], ["title", "id"]);
+        parent::__construct("categories", ["id"], ["title", "description"]);
     }
 
     /**
@@ -30,10 +30,24 @@ class Category extends Model
     }
 
     /**
+     * @return Post
+     */
+    public function posts(): Post
+    {
+        return (new Post())->find("category = :id", "id={$this->id}");
+    }
+
+    /**
      * @return bool
      */
     public function save(): bool
     {
+        $checkUri = (new Category())->find("uri = :uri AND id != :id", "uri={$this->uri}&id={$this->id}");
 
+        if ($checkUri->count()) {
+            $this->uri = "{$this->uri}-{$this->lastId()}";
+        }
+
+        return parent::save();
     }
 }

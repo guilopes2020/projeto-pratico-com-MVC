@@ -23,7 +23,7 @@
         <div class="post_page_content">
             <div class="htmlchars">
                 <h2><?= $post->subtitle; ?></h2>
-                <?= $post->content; ?>
+                <?= html_entity_decode($post->content); ?>
             </div>
 
             <aside class="social_share">

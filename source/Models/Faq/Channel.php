@@ -19,10 +19,10 @@ class Channel extends Model
     }
 
     /**
-     * @return bool
+     * @return Question
      */
-    public function save(): bool
+    public function questions(): Question
     {
-
+        return (new Question())->find("channel_id = :id", "id={$this->id}");
     }
 }

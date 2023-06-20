@@ -10,16 +10,11 @@ use Source\Core\Model;
  */
 class Post extends Model
 {
-    /** @var bool */
-    private $all;
-
     /**
      * Post constructor.
-     * @param bool $all = ignore status and post_at
      */
-    public function __construct(bool $all = false)
+    public function __construct()
     {
-        $this->all = $all;
         parent::__construct("posts", ["id"], ["title", "uri", "subtitle", "content"]);
     }
 
@@ -29,12 +24,11 @@ class Post extends Model
      * @param string $columns
      * @return mixed|Model
      */
-    public function find(?string $terms = null, ?string $params = null, string $columns = "*")
+    public function findPost(?string $terms = null, ?string $params = null, string $columns = "*")
     {
-        if (!$this->all) {
-            $terms = "status = :status AND post_at <= NOW()" . ($terms ? " AND {$terms}" : "");
-            $params = "status=post" . ($params ? "&{$params}" : "");
-        }
+        $terms = "status = :status AND post_at <= NOW()" . ($terms ? " AND {$terms}" : "");
+        $params = "status=post" . ($params ? "&{$params}" : "");
+
         return parent::find($terms, $params, $columns);
     }
 
@@ -76,20 +70,12 @@ class Post extends Model
      */
     public function save(): bool
     {
-        /** Post Update */
-        if (!empty($this->id)) {
-            $postId = $this->id;
+        $checkUri = (new Post())->find("uri = :uri AND id != :id", "uri={$this->uri}&id={$this->id}");
 
-            $this->update($this->safe(), "id = :id", "id={$postId}");
-            if ($this->fail()) {
-                $this->message->error("Erro ao atualizar, verifique os dados");
-                return false;
-            }
+        if ($checkUri->count()) {
+            $this->uri = "{$this->uri}-{$this->lastId()}";
         }
 
-        /** Post Creste */
-
-        $this->data = $this->findById($postId)->data();
-        return true;
+        return parent::save();
     }
 }
